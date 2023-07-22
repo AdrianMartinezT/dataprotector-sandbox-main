@@ -12,8 +12,12 @@ import {
   Container,
   Select,
   MenuItem,
+  Drawer, // Agregamos el componente Drawer de Material-UI para el menú lateral
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
-import { RecordedData } from './RecordedData'; // Importando el componente RecordedData
+import { Link as RouterLink } from 'react-router-dom';
 import {
   protectDataFunc,
   grantAccessFunc,
@@ -23,6 +27,19 @@ import Connect from './Connect';
 import { useAccount, useDisconnect } from 'wagmi';
 import { IEXEC_EXPLORER_URL } from '../utils/config';
 import { DataSchema, GrantedAccess } from '@iexec/dataprotector';
+
+// Componente para el menú lateral
+const SideMenu = () => {
+  return (
+    <Drawer variant="permanent" anchor="left">
+      <List>
+        <ListItem button component={RouterLink} to="/recordeddata">
+          <ListItemText primary="Recorded Data" />
+        </ListItem>
+      </List>
+    </Drawer>
+  );
+};
 
 export default function Front() {
   //web3mail dapp END
@@ -169,32 +186,66 @@ export default function Front() {
 
   return (
     <Container disableGutters>
-      <AppBar position="static" elevation={0} sx={{ backgroundColor: 'transparent', width: '100%' }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          {/* Enlace a recordeddata.tsx */}
-          <Link href="/recordeddata" sx={{ textDecoration: 'none' }}>
-            <Button variant="outlined" color="primary">
-              Recorded Data
-            </Button>
-          </Link>
-
-          <Typography sx={{ flexGrow: 1, textAlign: 'right', mr: 2, fontStyle: 'italic' }}>
-            {shortAddress(address as string)}
-          </Typography>
-
-          <Button variant="contained" onClick={() => disconnect()}>
-            Disconnect
-          </Button>
-        </Toolbar>
-      </AppBar>
-
       {isConnected ? (
         <>
+          {/* App bar for wallet connection */}
+          <AppBar
+            position="static"
+            elevation={0}
+            sx={{ backgroundColor: 'transparent', width: '100%' }}
+          >
+            <Toolbar sx={{ justifyContent: 'space-between' }}>
+              {/* Side menu */}
+              <SideMenu />
+
+              <Typography
+                sx={{
+                  flexGrow: 1,
+                  textAlign: 'right',
+                  mr: 2,
+                  fontStyle: 'italic',
+                }}
+              >
+                {shortAddress(address as string)}
+              </Typography>
+              <Button variant="contained" onClick={() => disconnect()}>
+                Disconnect
+              </Button>
+            </Toolbar>
+          </AppBar>
+
+          {/* Side menu */}
+          <SideMenu />
+
           {/* First Box to create a Protected Data */}
           <Box id="form-box">
             <Typography component="h1" variant="h5" sx={{ mt: 3 }}>
               Protect your data
             </Typography>
+
+            <TextField
+              fullWidth
+              id="name"
+              label="Name"
+              variant="outlined"
+              value={name}
+              onChange={handleNameChange}
+              sx={{ mt: 3 }}
+            />
+
+            <TextField
+              required
+              fullWidth
+              id="email"
+              label="Email"
+              variant="outlined"
+              sx={{ mt: 3 }}
+              value={email}
+              onChange={handleEmailChange}
+              type="email"
+              error={!isValidEmail}
+              helperText={!isValidEmail && 'Please enter a valid email address'}
+            />
 
             {/* Select para la ocupación */}
             <Select
@@ -307,29 +358,7 @@ export default function Front() {
               <MenuItem value="&gt;53">&gt;53</MenuItem>
             </Select>
 
-            <TextField
-              fullWidth
-              id="name"
-              label="Name"
-              variant="outlined"
-              value={name}
-              onChange={handleNameChange}
-              sx={{ mt: 3 }}
-            />
 
-            <TextField
-              required
-              fullWidth
-              id="email"
-              label="Email"
-              variant="outlined"
-              sx={{ mt: 3 }}
-              value={email}
-              onChange={handleEmailChange}
-              type="email"
-              error={!isValidEmail}
-              helperText={!isValidEmail && 'Please enter a valid email address'}
-            />
 
             {errorProtect && (
               <Alert sx={{ mt: 3, mb: 2 }} severity="error">
