@@ -228,7 +228,7 @@ export default function Front() {
         <tbody>
           <tr>
             <td>Name</td>
-            <td>
+            <td  className="second-column">
               <TextField
                 fullWidth
                 id="name"
